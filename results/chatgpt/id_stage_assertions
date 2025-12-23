@@ -1,0 +1,59 @@
+// Reset clears pipeline registers
+assert property (@(posedge clk_i) !rst_ni |-> issue_q == '0);
+
+// Flush clears valid bits
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_i |-> ##1 (issue_q[0].valid == 1'b0));
+
+// Issue acknowledge clears valid bit
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_instr_ack_i[0] |-> ##1 (issue_q[0].valid == 1'b0));
+
+// Fetch ready implies no stall
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  fetch_entry_ready_o[0] |-> !stall_instr_fetch[0]);
+
+// Issue valid implies decoded valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_q[0].valid |-> decoded_instruction_valid[0]);
+
+// Control flow flag consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_q[0].valid |-> (is_ctrl_flow_o[0] == issue_q[0].is_ctrl_flow));
+
+// Orig instr propagated correctly
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_q[0].valid |-> (orig_instr_o[0] == issue_q[0].orig_instr));
+
+// Superscalar port 1 stall behavior
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (CVA6Cfg.SuperscalarEn && stall_instr_fetch[1]) |-> !fetch_entry_ready_o[1]);
+
+// Compressed illegal instruction stalls fetch
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  is_illegal_rvc[0] |-> stall_instr_fetch[0]);
+
+// CVXIF stall propagates to fetch
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (CVA6Cfg.CvxifEn && stall_macro_deco) |-> stall_instr_fetch[0]);
+
+// ZCMT stall propagates to fetch
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (CVA6Cfg.RVZCMT && stall_macro_deco_zcmt) |-> stall_instr_fetch[0]);
+
+// Fetch valid without stall leads to issue valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (fetch_entry_valid_i[0] && fetch_entry_ready_o[0]) |-> ##1 issue_q[0].valid);
+
+// RVFI compressed matches RVC decode
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  rvfi_is_compressed_o[0] == is_compressed_rvc[0]);
+
+// No issue valid without fetch or hold
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (!fetch_entry_valid_i[0] && !issue_q[0].valid) |-> !issue_n[0].valid);
+
+// Instruction decode stability when stalled
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  stall_instr_fetch[0] |-> $stable(issue_q[0]));
+

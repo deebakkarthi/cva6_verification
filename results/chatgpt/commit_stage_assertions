@@ -1,0 +1,151 @@
+// ------------------------------------------------------------
+// Reset / basic sanity
+// ------------------------------------------------------------
+assert property (@(posedge clk_i) !rst_ni |-> !exception_o.valid);
+assert property (@(posedge clk_i) !rst_ni |-> !dirty_fp_state_o);
+
+// ------------------------------------------------------------
+// Commit acknowledge protocol
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_ack_o[0] |-> commit_instr_i[0].valid);
+
+assert property (@(posedge clk_i)
+  commit_ack_o[1] |-> (CVA6Cfg.NrCommitPorts > 1 && commit_instr_i[1].valid));
+
+assert property (@(posedge clk_i)
+  halt_i |-> !commit_ack_o[0]);
+
+// ------------------------------------------------------------
+// Commit drop behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_drop_i[0] |-> !we_gpr_o[0] && !we_fpr_o[0]);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.NrCommitPorts > 1 && commit_drop_i[1]) |-> !we_gpr_o[1] && !we_fpr_o[1]);
+
+// ------------------------------------------------------------
+// Register write consistency
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  we_gpr_o[0] |-> commit_ack_o[0]);
+
+assert property (@(posedge clk_i)
+  we_fpr_o[0] |-> commit_ack_o[0]);
+
+assert property (@(posedge clk_i)
+  we_gpr_o[0] |-> !ariane_pkg::is_rd_fpr(commit_instr_i[0].op));
+
+assert property (@(posedge clk_i)
+  we_fpr_o[0] |-> ariane_pkg::is_rd_fpr(commit_instr_i[0].op));
+
+// ------------------------------------------------------------
+// FP dirty state
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  dirty_fp_state_o |-> CVA6Cfg.FpPresent);
+
+assert property (@(posedge clk_i)
+  commit_ack_o[0] && (commit_instr_i[0].fu inside {FPU, FPU_VEC})
+  |-> dirty_fp_state_o);
+
+// ------------------------------------------------------------
+// LSU commit behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_lsu_o |-> commit_instr_i[0].fu == STORE);
+
+assert property (@(posedge clk_i)
+  (commit_instr_i[0].fu == STORE && !commit_lsu_ready_i)
+  |-> !commit_ack_o[0]);
+
+// ------------------------------------------------------------
+// CSR commit behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_csr_o |-> commit_instr_i[0].fu == CSR);
+
+assert property (@(posedge clk_i)
+  csr_exception_i.valid |-> !commit_csr_o);
+
+// ------------------------------------------------------------
+// Fence and flush behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  fence_i_o |-> no_st_pending_i);
+
+assert property (@(posedge clk_i)
+  fence_o |-> no_st_pending_i);
+
+assert property (@(posedge clk_i)
+  sfence_vma_o |-> no_st_pending_i);
+
+assert property (@(posedge clk_i)
+  hfence_vvma_o |-> no_st_pending_i);
+
+assert property (@(posedge clk_i)
+  hfence_gvma_o |-> no_st_pending_i);
+
+// ------------------------------------------------------------
+// AMO behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  amo_valid_commit_o |-> (CVA6Cfg.RVA && is_amo(commit_instr_i[0].op)));
+
+assert property (@(posedge clk_i)
+  amo_valid_commit_o |-> amo_resp_i.ack == commit_ack_o[0]);
+
+assert property (@(posedge clk_i)
+  amo_valid_commit_o |-> flush_commit_o);
+
+// ------------------------------------------------------------
+// Dual commit port rules
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_ack_o[1] |-> commit_ack_o[0]);
+
+assert property (@(posedge clk_i)
+  commit_ack_o[1] |-> !single_step_i);
+
+assert property (@(posedge clk_i)
+  commit_ack_o[1] |-> !(commit_instr_i[0].fu inside {CSR}));
+
+// ------------------------------------------------------------
+// Exception generation
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  exception_o.valid |-> commit_instr_i[0].valid);
+
+assert property (@(posedge clk_i)
+  commit_instr_i[0].ex.valid |-> exception_o.valid);
+
+assert property (@(posedge clk_i)
+  csr_exception_i.valid && commit_instr_i[0].valid
+  |-> exception_o.valid);
+
+assert property (@(posedge clk_i)
+  halt_i |-> !exception_o.valid);
+
+// ------------------------------------------------------------
+// Macro instruction acknowledgment
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_macro_ack_o[0] |-> commit_ack_o[0]);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.NrCommitPorts > 1 && commit_macro_ack_o[1])
+  |-> commit_ack_o[1]);
+
+// ------------------------------------------------------------
+// PC consistency
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_instr_i[0].valid |-> pc_o == commit_instr_i[0].pc);
+
+// ------------------------------------------------------------
+// Transaction ID consistency
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  commit_instr_i[0].valid |-> commit_tran_id_o == commit_instr_i[0].trans_id);
+

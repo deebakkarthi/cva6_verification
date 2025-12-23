@@ -1,0 +1,109 @@
+// ------------------------------------------------------------
+// Reset behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i) !rst_ni |-> !fence_active_q);
+assert property (@(posedge clk_i) !rst_ni |-> !fence_i_active_q);
+assert property (@(posedge clk_i) !rst_ni |-> !flush_dcache_o);
+
+// ------------------------------------------------------------
+// Mispredict behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  resolved_branch_i.is_mispredict |-> flush_if_o);
+
+assert property (@(posedge clk_i)
+  resolved_branch_i.is_mispredict |-> flush_unissued_instr_o);
+
+// ------------------------------------------------------------
+// Fence behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  fence_i |-> flush_if_o && flush_id_o && flush_ex_o);
+
+assert property (@(posedge clk_i)
+  fence_i |-> set_pc_commit_o);
+
+assert property (@(posedge clk_i)
+  (fence_i && CVA6Cfg.DcacheFlushOnFence) |-> flush_dcache_o);
+
+// ------------------------------------------------------------
+// Fence.i behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  fence_i_i |-> flush_if_o && flush_id_o && flush_ex_o && flush_icache_o);
+
+assert property (@(posedge clk_i)
+  (fence_i_i && CVA6Cfg.DcacheFlushOnFence) |-> fence_i_active_d);
+
+// ------------------------------------------------------------
+// Fence active tracking
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  fence_active_q |-> flush_dcache_o);
+
+assert property (@(posedge clk_i)
+  (flush_dcache_ack_i && fence_active_q) |-> !fence_active_d);
+
+// ------------------------------------------------------------
+// SFENCE / HFENCE behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVS && sfence_vma_i) |-> flush_if_o && flush_id_o && flush_ex_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVS && sfence_vma_i && !(CVA6Cfg.RVH && v_i)) |-> flush_tlb_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVH && sfence_vma_i && v_i) |-> flush_tlb_vvma_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVH && hfence_vvma_i) |-> flush_tlb_vvma_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVH && hfence_gvma_i) |-> flush_tlb_gvma_o);
+
+// ------------------------------------------------------------
+// CSR / accelerator flush behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  (flush_csr_i || flush_acc_i) |-> flush_if_o && flush_id_o && flush_ex_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.RVA && flush_commit_i) |-> flush_if_o && flush_id_o && flush_ex_o);
+
+// ------------------------------------------------------------
+// Exception / ERET / Debug behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  (ex_valid_i || eret_i) |-> flush_if_o && flush_id_o && flush_ex_o);
+
+assert property (@(posedge clk_i)
+  (CVA6Cfg.DebugEn && set_debug_pc_i) |-> flush_bp_o);
+
+// ------------------------------------------------------------
+// Halt logic
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  halt_frontend_o |-> fence_i_active_q);
+
+assert property (@(posedge clk_i)
+  halt_o |-> (halt_csr_i || halt_acc_i || (CVA6Cfg.DcacheFlushOnFence && fence_active_q)));
+
+// ------------------------------------------------------------
+// Flush dcache register behavior
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  flush_dcache_o |-> CVA6Cfg.DcacheFlushOnFence);
+
+// ------------------------------------------------------------
+// Mutual consistency
+// ------------------------------------------------------------
+assert property (@(posedge clk_i)
+  flush_icache_o |-> flush_if_o);
+
+assert property (@(posedge clk_i)
+  flush_tlb_vvma_o |-> CVA6Cfg.RVH);
+
+assert property (@(posedge clk_i)
+  flush_tlb_gvma_o |-> CVA6Cfg.RVH);
+

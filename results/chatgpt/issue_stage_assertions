@@ -1,0 +1,97 @@
+// Reset behavior
+assert property (@(posedge clk_i) !rst_ni |-> sb_full_o == 1'b0);
+
+// Flush clears scoreboard issuing
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_i |-> !issue_instr_valid_sb_iro[0]);
+
+// Flush unissued prevents handshake
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_unissued_instr_i |-> !issue_instr_hs_o);
+
+// Issue handshake consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_instr_hs_o |-> (issue_instr_valid_sb_iro[0] && issue_ack_iro_sb[0]));
+
+// Ack only when valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_ack_iro_sb[0] |-> issue_instr_valid_sb_iro[0]);
+
+// Stall prevents issue handshake
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  stall_i |-> !issue_instr_hs_o);
+
+// Scoreboard full stalls issue
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  sb_full_o |-> !decoded_instr_ack_o[0]);
+
+// Decoded ack implies decoded valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  decoded_instr_ack_o[0] |-> decoded_instr_valid_i[0]);
+
+// Issue valid implies decoded instruction exists
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_instr_valid_sb_iro[0] |-> decoded_instr_valid_i[0]);
+
+// Orig instruction stable during stall
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  stall_i |-> $stable(orig_instr_sb_iro[0]));
+
+// FU valid requires issue valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (|alu_valid_o || |branch_valid_o || |lsu_valid_o ||
+   |mult_valid_o || |fpu_valid_o || |alu2_valid_o ||
+   |csr_valid_o  || |xfu_valid_o) |-> issue_instr_valid_sb_iro[0]);
+
+// LSU valid requires LSU ready or valid issue
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |lsu_valid_o |-> issue_instr_valid_sb_iro[0]);
+
+// FPU valid requires FPU ready or early valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |fpu_valid_o |-> (fpu_ready_i || fpu_early_valid_i));
+
+// Branch valid implies control-flow instruction
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |branch_valid_o |-> issue_instr_sb_iro[0].is_ctrl_flow);
+
+// Resolve branch implies prior branch valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  resolve_branch_i |-> |branch_valid_o);
+
+// CVXIF transaction accepted implies issue valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_transaction_accepted_iro_sb |-> issue_instr_valid_sb_iro[0]);
+
+// CVXIF rejection implies issue valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_transaction_rejected_o |-> issue_instr_valid_sb_iro[0]);
+
+// CVXIF writeback implies transaction accepted
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_issue_writeback_iro_sb |-> x_transaction_accepted_iro_sb);
+
+// Commit valid requires commit acknowledge eventually
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_commit_valid_o |-> ##[0:$] (|commit_ack_i));
+
+// RVFI issue pointer valid when issue valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  issue_instr_valid_sb_iro[0] |-> rvfi_issue_pointer_o[0] != '0);
+
+// RVFI commit pointer valid when commit ack
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |commit_ack_i |-> rvfi_commit_pointer_o[0] != '0);
+
+// Stall issue output consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  stall_issue_o |-> stall_i);
+
+// PC stable during stall
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  stall_i |-> $stable(pc_o));
+
+// Compressed instruction flag consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  is_compressed_instr_o |-> issue_instr_sb_iro[0].is_compressed);
+

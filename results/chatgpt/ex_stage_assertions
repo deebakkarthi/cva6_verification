@@ -1,0 +1,121 @@
+// Reset behavior
+assert property (@(posedge clk_i) !rst_ni |-> !flu_valid_o);
+assert property (@(posedge clk_i) !rst_ni |-> !resolve_branch_o);
+assert property (@(posedge clk_i) !rst_ni |-> !load_valid_o);
+assert property (@(posedge clk_i) !rst_ni |-> !store_valid_o);
+
+// Flush clears outstanding operations
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_i |-> !flu_valid_o);
+
+// FLU valid implies some source valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flu_valid_o |-> (|alu_valid_i || |branch_valid_i || |csr_valid_i || |aes_valid_i || mult_valid));
+
+// FLU ready requires CSR and multiplier ready
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flu_ready_o |-> (csr_ready && mult_ready));
+
+// Branch resolution consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  resolve_branch_o |-> |branch_valid_i);
+
+// Branch resolve implies resolved branch valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  resolve_branch_o |-> resolved_branch_o.valid);
+
+// ALU valid implies FLU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |alu_valid_i |-> flu_valid_o);
+
+// CSR valid implies FLU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |csr_valid_i |-> flu_valid_o);
+
+// Mult valid implies FLU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  mult_valid |-> flu_valid_o);
+
+// AES valid implies FLU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |aes_valid_i |-> flu_valid_o);
+
+// LSU valid requires LSU ready or outstanding op
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |lsu_valid_i |-> lsu_ready_o);
+
+// Load valid implies LSU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  load_valid_o |-> |lsu_valid_i);
+
+// Store valid implies LSU valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  store_valid_o |-> |lsu_valid_i);
+
+// Load and store not valid simultaneously
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  !(load_valid_o && store_valid_o));
+
+// FPU valid implies FPU ready or internal valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  fpu_valid_o |-> fpu_ready_o || fpu_valid);
+
+// FPU early valid implies FPU present
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  fpu_early_valid_o |-> CVA6Cfg.FpPresent);
+
+// ALU2 contributes only when superscalar
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |alu2_valid_i |-> CVA6Cfg.SuperscalarEn);
+
+// CVXIF valid implies ready or outstanding transaction
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_valid_o |-> x_ready_o || x_result_valid_i);
+
+// CVXIF transaction rejected implies exception
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_transaction_rejected_i |-> x_exception_o.valid);
+
+// CVXIF result valid handshake
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  x_result_valid_i |-> x_result_ready_o);
+
+// CSR commit requires prior CSR valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  csr_commit_i |-> |csr_valid_i);
+
+// No store pending indicates no LSU stall
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  no_st_pending_o |-> !stall_st_pending_i);
+
+// TLB flush clears sfence/hfence flags
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_i |-> (!current_instruction_is_sfence_vma &&
+               !current_instruction_is_hfence_vvma &&
+               !current_instruction_is_hfence_gvma));
+
+// SFENCE tracking requires CSR valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  current_instruction_is_sfence_vma |-> |csr_valid_i);
+
+// HFENCE tracking requires CSR valid
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (current_instruction_is_hfence_vvma || current_instruction_is_hfence_gvma)
+  |-> |csr_valid_i);
+
+// Atomic commit implies LSU activity
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  amo_valid_commit_i |-> |lsu_valid_i);
+
+// Instruction forwarding stability during flush
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  flush_i |-> $stable(rs1_forwarding_i[0]) && $stable(rs2_forwarding_i[0]));
+
+// One-cycle select implies exactly one source
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |one_cycle_select |-> ($onehot0(one_cycle_select)));
+
+// Branch valid implies ALU comparison used
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  |branch_valid_i |-> alu_branch_res !== 1'bx);
+

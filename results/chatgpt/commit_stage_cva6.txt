@@ -1,0 +1,116 @@
+
+==============================================================
+    Jasper Verification Results
+==============================================================
+    2024.06 FCS 64 bits for Linux64 3.10.0-1160.21.1.el7.x86_64
+    Host Name: blackrock-s.ece.virginia.edu
+    User Name: brg8ve
+    Printed on: Monday, Dec22, 2025 06:54:26 PM EST
+    Working Directory: /net/marysrock.ece.Virginia.EDU/maryisan/users/brg8ve/cva6_verif
+
+
+==============================================================
+SUMMARY
+==============================================================
+    Total Tasks           : 1
+    Total Properties      : 72
+          assumptions     : 0                   
+           - approved     : 0                   
+           - temporary    : 0                   
+          assertions      : 36                  
+           - proven       : 31                  ( 86.1% )
+           - marked_proven: 0                   ( 0.0% )
+           - cex          : 4                   ( 11.1% )
+           - ar_cex       : 0                   ( 0.0% )
+           - undetermined : 1                   ( 2.8% )
+           - unprocessed  : 0                   ( 0.0% )
+           - error        : 0                   ( 0.0% )
+          covers          : 36                  
+           - unreachable  : 6                   ( 16.7% )
+           - covered      : 30                  ( 83.3% )
+           - ar_covered   : 0                   ( 0.0% )
+           - undetermined : 0                   ( 0.0% )
+           - unprocessed  : 0                   ( 0.0% )
+           - error        : 0                   ( 0.0% )
+
+==============================================================
+RESULTS
+==============================================================
+
+---------------------------------------------------------------------------------------------------------
+       Name                                             |    Result    |  Engine  |  Bound  |  Time    
+---------------------------------------------------------------------------------------------------------
+
+---[ <embedded> ]----------------------------------------------------------------------------------------
+[1]   cva6.commit_stage_i._assert_1                          proven          PRE    Infinite    0.000 s      
+[2]   cva6.commit_stage_i._assert_1:precondition1            unreachable     PRE    Infinite    0.000 s      
+[3]   cva6.commit_stage_i._assert_2                          proven          PRE    Infinite    0.000 s      
+[4]   cva6.commit_stage_i._assert_2:precondition1            unreachable     PRE    Infinite    0.000 s      
+[5]   cva6.commit_stage_i._assert_3                          proven          N      Infinite    0.050 s      
+[6]   cva6.commit_stage_i._assert_3:precondition1            covered         Bm          263    14.091 s     
+[7]   cva6.commit_stage_i._assert_4                          proven          Hp     Infinite    0.374 s      
+[8]   cva6.commit_stage_i._assert_4:precondition1            covered         Bm          264    17.329 s     
+[9]   cva6.commit_stage_i._assert_5                          proven          Hp     Infinite    0.374 s      
+[10]  cva6.commit_stage_i._assert_5:precondition1            covered         Bm          264    16.967 s     
+[11]  cva6.commit_stage_i._assert_6                          proven          PRE    Infinite    0.000 s      
+[12]  cva6.commit_stage_i._assert_6:precondition1            unreachable     PRE    Infinite    0.000 s      
+[13]  cva6.commit_stage_i._assert_7                          proven          PRE    Infinite    0.000 s      
+[14]  cva6.commit_stage_i._assert_7:precondition1            unreachable     PRE    Infinite    0.000 s      
+[15]  cva6.commit_stage_i._assert_8                          cex             Bm          264    17.688 s     
+[16]  cva6.commit_stage_i._assert_8:precondition1            covered         Bm          263    14.091 s     
+[17]  cva6.commit_stage_i._assert_9                          proven          Mpcustom4  Infinite  158.278 s  
+[18]  cva6.commit_stage_i._assert_9:precondition1            covered         Bm          270    61.652 s     
+[19]  cva6.commit_stage_i._assert_10                         proven          Hp     Infinite    0.374 s      
+[20]  cva6.commit_stage_i._assert_10:precondition1           covered         Bm          263    14.091 s     
+[21]  cva6.commit_stage_i._assert_11                         proven          PRE    Infinite    0.000 s      
+[22]  cva6.commit_stage_i._assert_11:precondition1           covered         Bm          270    61.652 s     
+[23]  cva6.commit_stage_i._assert_12                         proven          PRE    Infinite    0.000 s      
+[24]  cva6.commit_stage_i._assert_12:precondition1           covered         Bm          270    61.652 s     
+[25]  cva6.commit_stage_i._assert_13                         cex             Bm          270    62.094 s     
+[26]  cva6.commit_stage_i._assert_13:precondition1           covered         Bm          270    61.652 s     
+[27]  cva6.commit_stage_i._assert_14                         proven          Hp     Infinite    0.374 s      
+[28]  cva6.commit_stage_i._assert_14:precondition1           covered         Bm          263    14.739 s     
+[29]  cva6.commit_stage_i._assert_15                         undetermined    Bm       329 -     1190.929 s   
+[30]  cva6.commit_stage_i._assert_15:precondition1           covered         Bm          267    35.332 s     
+[31]  cva6.commit_stage_i._assert_16                         proven          Hp     Infinite    0.375 s      
+[32]  cva6.commit_stage_i._assert_16:precondition1           covered         Bm          263    14.091 s     
+[33]  cva6.commit_stage_i._assert_17                         proven          Hp     Infinite    0.375 s      
+[34]  cva6.commit_stage_i._assert_17:precondition1           covered         Bm          263    14.399 s     
+[35]  cva6.commit_stage_i._assert_18                         proven          Hp     Infinite    0.375 s      
+[36]  cva6.commit_stage_i._assert_18:precondition1           covered         Bm          263    15.041 s     
+[37]  cva6.commit_stage_i._assert_19                         proven          Hp     Infinite    0.375 s      
+[38]  cva6.commit_stage_i._assert_19:precondition1           covered         Bm          263    14.091 s     
+[39]  cva6.commit_stage_i._assert_20                         proven          Hp     Infinite    0.376 s      
+[40]  cva6.commit_stage_i._assert_20:precondition1           covered         Bm          263    15.343 s     
+[41]  cva6.commit_stage_i._assert_21                         proven          PRE    Infinite    0.000 s      
+[42]  cva6.commit_stage_i._assert_21:precondition1           unreachable     PRE    Infinite    0.000 s      
+[43]  cva6.commit_stage_i._assert_22                         proven          PRE    Infinite    0.000 s      
+[44]  cva6.commit_stage_i._assert_22:precondition1           unreachable     PRE    Infinite    0.000 s      
+[45]  cva6.commit_stage_i._assert_23                         proven          PRE    Infinite    0.000 s      
+[46]  cva6.commit_stage_i._assert_23:precondition1           covered         Bm          263    15.662 s     
+[47]  cva6.commit_stage_i._assert_24                         proven          Hp     Infinite    0.376 s      
+[48]  cva6.commit_stage_i._assert_24:precondition1           covered         Bm          263    15.662 s     
+[49]  cva6.commit_stage_i._assert_25                         cex             Bm          263    15.662 s     
+[50]  cva6.commit_stage_i._assert_25:precondition1           covered         Bm          263    15.662 s     
+[51]  cva6.commit_stage_i._assert_26                         proven          Hp     Infinite    0.376 s      
+[52]  cva6.commit_stage_i._assert_26:precondition1           covered         Bm          264    17.329 s     
+[53]  cva6.commit_stage_i._assert_27                         proven          Hp     Infinite    0.376 s      
+[54]  cva6.commit_stage_i._assert_27:precondition1           covered         Bm          264    17.329 s     
+[55]  cva6.commit_stage_i._assert_28                         proven          Hp     Infinite    0.376 s      
+[56]  cva6.commit_stage_i._assert_28:precondition1           covered         Bm          264    17.329 s     
+[57]  cva6.commit_stage_i._assert_29                         proven          Hp     Infinite    0.376 s      
+[58]  cva6.commit_stage_i._assert_29:precondition1           covered         Bm          262    13.262 s     
+[59]  cva6.commit_stage_i._assert_30                         cex             Bm          264    18.404 s     
+[60]  cva6.commit_stage_i._assert_30:precondition1           covered         Bm          262    13.262 s     
+[61]  cva6.commit_stage_i._assert_31                         proven          Hp     Infinite    0.377 s      
+[62]  cva6.commit_stage_i._assert_31:precondition1           covered         Bm          263    14.399 s     
+[63]  cva6.commit_stage_i._assert_32                         proven          PRE    Infinite    0.000 s      
+[64]  cva6.commit_stage_i._assert_32:precondition1           covered         Bm          264    16.967 s     
+[65]  cva6.commit_stage_i._assert_33                         proven          PRE    Infinite    0.000 s      
+[66]  cva6.commit_stage_i._assert_33:precondition1           covered         Bm          263    14.091 s     
+[67]  cva6.commit_stage_i._assert_34                         proven          PRE    Infinite    0.000 s      
+[68]  cva6.commit_stage_i._assert_34:precondition1           covered         Bm          264    17.329 s     
+[69]  cva6.commit_stage_i._assert_35                         proven          PRE    Infinite    0.000 s      
+[70]  cva6.commit_stage_i._assert_35:precondition1           covered         Bm          262    13.262 s     
+[71]  cva6.commit_stage_i._assert_36                         proven          PRE    Infinite    0.000 s      
+[72]  cva6.commit_stage_i._assert_36:precondition1           covered         Bm          262    13.262 s     

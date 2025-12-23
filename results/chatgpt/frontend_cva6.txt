@@ -1,0 +1,89 @@
+
+==============================================================
+    Jasper Verification Results
+==============================================================
+    2024.06 FCS 64 bits for Linux64 3.10.0-1160.21.1.el7.x86_64
+    Host Name: blackrock-s.ece.virginia.edu
+    User Name: brg8ve
+    Printed on: Monday, Dec22, 2025 04:56:58 PM EST
+    Working Directory: /net/marysrock.ece.Virginia.EDU/maryisan/users/brg8ve/cva6_verif
+
+
+==============================================================
+SUMMARY
+==============================================================
+    Total Tasks           : 1
+    Total Properties      : 45
+          assumptions     : 0                   
+           - approved     : 0                   
+           - temporary    : 0                   
+          assertions      : 23                  
+           - proven       : 16                  ( 69.6% )
+           - marked_proven: 0                   ( 0.0% )
+           - cex          : 7                   ( 30.4% )
+           - ar_cex       : 0                   ( 0.0% )
+           - undetermined : 0                   ( 0.0% )
+           - unprocessed  : 0                   ( 0.0% )
+           - error        : 0                   ( 0.0% )
+          covers          : 22                  
+           - unreachable  : 3                   ( 13.6% )
+           - covered      : 19                  ( 86.4% )
+           - ar_covered   : 0                   ( 0.0% )
+           - undetermined : 0                   ( 0.0% )
+           - unprocessed  : 0                   ( 0.0% )
+           - error        : 0                   ( 0.0% )
+
+==============================================================
+RESULTS
+==============================================================
+
+-----------------------------------------------------------------------------------------------------
+       Name                                         |    Result    |  Engine  |  Bound  |  Time    
+-----------------------------------------------------------------------------------------------------
+
+---[ <embedded> ]------------------------------------------------------------------------------------
+[1]   cva6.i_frontend._assert_1                          proven          PRE    Infinite    0.000 s      
+[2]   cva6.i_frontend._assert_1:precondition1            unreachable     PRE    Infinite    0.000 s      
+[3]   cva6.i_frontend._assert_2                          proven          PRE    Infinite    0.000 s      
+[4]   cva6.i_frontend._assert_2:precondition1            unreachable     PRE    Infinite    0.000 s      
+[5]   cva6.i_frontend._assert_3                          proven          PRE    Infinite    0.000 s      
+[6]   cva6.i_frontend._assert_3:precondition1            unreachable     PRE    Infinite    0.000 s      
+[7]   cva6.i_frontend._assert_4                          proven          PRE    Infinite    0.000 s      
+[8]   cva6.i_frontend._assert_4:precondition1            covered         PRE           1    0.000 s      
+[9]   cva6.i_frontend._assert_5                          proven          PRE    Infinite    0.000 s      
+[10]  cva6.i_frontend._assert_5:precondition1            covered         PRE           1    0.000 s      
+[11]  cva6.i_frontend._assert_6                          proven          PRE    Infinite    0.000 s      
+[12]  cva6.i_frontend._assert_6:precondition1            covered         Bm          257    10.536 s     
+[13]  cva6.i_frontend._assert_7                          proven          PRE    Infinite    0.000 s      
+[14]  cva6.i_frontend._assert_7:precondition1            covered         Bm          259    11.323 s     
+[15]  cva6.i_frontend._assert_8                          cex             Bm          262    13.943 s     
+[16]  cva6.i_frontend._assert_8:precondition1            covered         Bm          260    12.160 s     
+[17]  cva6.i_frontend._assert_9                          proven          Hp     Infinite    0.423 s      
+[18]  cva6.i_frontend._assert_9:precondition1            covered         Bm          259    11.323 s     
+[19]  cva6.i_frontend._assert_10                         proven          PRE    Infinite    0.000 s      
+[20]  cva6.i_frontend._assert_10:precondition1           covered         Bm          262    13.943 s     
+[21]  cva6.i_frontend._assert_11                         proven          PRE    Infinite    0.000 s      
+[22]  cva6.i_frontend._assert_11:precondition1           covered         Bm          262    13.943 s     
+[23]  cva6.i_frontend._assert_12                         proven          PRE    Infinite    0.000 s      
+[24]  cva6.i_frontend._assert_12:precondition1           covered         Bm          262    14.693 s     
+[25]  cva6.i_frontend._assert_13                         proven          Hp     Infinite    0.432 s      
+[26]  cva6.i_frontend._assert_13:precondition1           covered         Bm          261    13.037 s     
+[27]  cva6.i_frontend._assert_14                         cex             Bm          262    14.298 s     
+[28]  cva6.i_frontend._assert_14:precondition1           covered         Bm          262    14.298 s     
+[29]  cva6.i_frontend._assert_15                         cex             Bm          282    165.369 s    
+[30]  cva6.i_frontend._assert_15:precondition1           covered         Bm          263    15.804 s     
+[31]  cva6.i_frontend._assert_16                         proven          Hp     Infinite    0.452 s      
+[32]  cva6.i_frontend._assert_16:precondition1           covered         Bm          263    16.197 s     
+[33]  cva6.i_frontend._assert_17                         proven          Hp     Infinite    0.452 s      
+[34]  cva6.i_frontend._assert_17:precondition1           covered         Bm          262    14.298 s     
+[35]  cva6.i_frontend._assert_18                         cex             Bm          260    12.549 s     
+[36]  cva6.i_frontend._assert_19                         proven          Hp     Infinite    0.456 s      
+[37]  cva6.i_frontend._assert_19:precondition1           covered         Bm          260    12.549 s     
+[38]  cva6.i_frontend._assert_20                         proven          Hp     Infinite    0.456 s      
+[39]  cva6.i_frontend._assert_20:precondition1           covered         PRE           1    0.000 s      
+[40]  cva6.i_frontend._assert_21                         cex             Bm          258    10.914 s     
+[41]  cva6.i_frontend._assert_21:precondition1           covered         Bm          258    10.914 s     
+[42]  cva6.i_frontend._assert_22                         cex             PRE           1    0.000 s      
+[43]  cva6.i_frontend._assert_22:precondition1           covered         PRE           1    0.000 s      
+[44]  cva6.i_frontend._assert_23                         cex             Bm          259    11.683 s     
+[45]  cva6.i_frontend._assert_23:precondition1           covered         Bm          259    11.323 s     

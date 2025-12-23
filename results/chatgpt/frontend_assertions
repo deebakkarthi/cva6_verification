@@ -1,0 +1,87 @@
+// Reset behavior
+assert property (@(posedge clk_i) !rst_ni |-> npc_rst_load_q);
+assert property (@(posedge clk_i) !rst_ni |-> icache_valid_q == 1'b0);
+assert property (@(posedge clk_i) !rst_ni |-> speculative_q == 1'b0);
+
+// NPC reset load behavior
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  npc_rst_load_q |-> npc_d == boot_addr_i);
+
+// ICache request gating
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  icache_dreq_o.req |-> instr_queue_ready && !halt_frontend_i);
+
+// ICache ready implies request possible
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  if_ready |-> icache_dreq_i.ready && instr_queue_ready && !halt_frontend_i);
+
+// Kill signals consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  icache_dreq_o.kill_s2 |-> (icache_dreq_o.kill_s1 || bp_valid));
+
+// Speculative flag consistency
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  speculative_q |-> !flush_i);
+
+// Branch prediction validity
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  bp_valid |-> (|cf_type));
+
+// Mispredict implies valid resolved branch
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  is_mispredict |-> resolved_branch_i.valid);
+
+// BHT update validity
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  bht_update.valid |-> resolved_branch_i.valid);
+
+// BTB update validity
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  btb_update.valid |-> resolved_branch_i.valid && resolved_branch_i.is_mispredict);
+
+// Replay behavior
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  replay |-> !if_ready);
+
+// Exception priority over branch prediction
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  ex_valid_i |-> npc_d == trap_vector_base_i);
+
+// ERET priority over mispredict
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  eret_i && !ex_valid_i |-> npc_d == epc_i);
+
+// Commit PC set behavior
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  set_pc_commit_i |-> npc_d == pc_commit_i + (halt_i ? '0 : {{CVA6Cfg.VLEN-3{1'b0}},3'b100}));
+
+// Debug PC behavior
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (CVA6Cfg.DebugEn && set_debug_pc_i) |-> npc_d ==
+    (CVA6Cfg.DmBaseAddress[CVA6Cfg.VLEN-1:0] + CVA6Cfg.HaltAddress[CVA6Cfg.VLEN-1:0]));
+
+// RAS push/pop mutual exclusion
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  !(ras_push && ras_pop));
+
+// RAS pop requires valid prediction
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  ras_pop |-> ras_predict.valid);
+
+// Instruction queue ready implies no replay
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  instr_queue_ready |-> !replay);
+
+// ICache valid implies data capture
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  icache_dreq_i.valid |-> icache_valid_q);
+
+// Prediction address stability when no control flow
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  (!bp_valid && !replay && !is_mispredict && !eret_i && !ex_valid_i && !set_pc_commit_i)
+  |-> npc_d == npc_q);
+
+// Branch prediction target alignment
+assert property (@(posedge clk_i) disable iff (!rst_ni)
+  bp_valid |-> predict_address[CVA6Cfg.FETCH_ALIGN_BITS-1:0] == '0);
+
